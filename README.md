@@ -26,7 +26,7 @@ See the [Quickstart](https://github.com/mkst/conker/wiki/Quickstart) for more in
 git clone https://github.com/mkst/conker.git --recursive
 cd conker
 ```
-
+s
 **Build Docker image (optional)**
 
 ```sh
