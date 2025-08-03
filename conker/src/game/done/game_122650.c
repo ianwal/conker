@@ -6,9 +6,12 @@
 extern u8 D_80088B44;
 extern s32 D_800CC454;
 
+#pragma GLOBAL_ASM("asm/nonmatchings/game/done/game_122650/func_150F51A0.s")
+/*
 void func_150F51A0(s32 arg0, s32 arg1) {
     D_80088B40 = 1;
 }
+*/
 
 s32 func_150F51BC(void) {
     if (D_80088B40 != 0) {
