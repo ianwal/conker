@@ -257,6 +257,8 @@ n_syn             = 0x8002BA44;
 osViClock         = 0x8002BDE8;
 hdwrBugFlag       = 0x8002AB40;
 
+__libm_qnan_f     = 0x8002C920;
+
 piEventQueue      = 0x80036B40;
 __osPiAccessQueueEnabled = 0x8002BD60;
 __osPiAccessQueue = 0x800428F8;
