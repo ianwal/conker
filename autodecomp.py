@@ -23,6 +23,7 @@ from clang.cindex import Index, CursorKind, StorageClass
 log = logging.getLogger(__name__)
 
 
+# I just realized splat does this for you when you update yaml to C and build, lol. Don't use this.
 def convert_s_to_c(asm_file: Path, section: str) -> str:
     """Take an entire .s file and convert it into a C file."""
     with open(asm_file) as f:
@@ -42,7 +43,7 @@ def convert_s_to_c(asm_file: Path, section: str) -> str:
     return (
         "\n".join(headers)
         + "\n\n"
-        + "\n\n".join([to_pragma(fn, asm_file.split("/")[-1].replace(".s", ""), section) for fn in functions])
+        + "\n\n".join([to_pragma(fn, str(asm_file).split("/")[-1].replace(".s", ""), section) for fn in functions])
     )
 
 
@@ -80,6 +81,7 @@ def find_asm_lines(yaml_file, section):
                             "address": hex(parsed[0]),
                             "line_no": idx + 1,
                             "raw_line": line,
+                            "segment": "game",  # TODO: MAKE THIS NOT HARDCODED!!
                         }
                     )
             except yaml.YAMLError as exc:
@@ -270,12 +272,12 @@ def generate_mips_context(c_file: Path):
     return Path(__file__).parent / "conker/ctx.c"
 
 
-def update_yaml_to_c(file: Path, line_stuff: dict):  # TODO: Add section to line_stuff dict
+def update_yaml_to_c(file: Path, line_stuff: dict):
     with open(file, "r") as f:
         lines = f.readlines()
 
     lines[line_stuff["line_no"] - 1] = line_stuff["raw_line"].replace(
-        "asm", f"c, game_{line_stuff["address"][2:].upper()}"
+        "asm", f"c, {line_stuff['segment']}_{line_stuff['address'][2:].upper()}"
     )  # TODO: game --> {section}
 
     with open(file, "w+t") as f:
@@ -292,9 +294,19 @@ def main():
     # args = parser.parse_args()
     # print(args)
     # pragmas = get_globalasmpragmas(args.cfile)
+
+    # Build to regenerate the ASM and clean everything.
+    subprocess.run("./build.sh", check=True)
+
     yaml_file = Path(__file__).parent / "conker/conker.us.yaml"
     asm_yaml_stuff = find_asm_lines(yaml_file, "subsegments")
+    print(asm_yaml_stuff[0])
+    # convert_s_to_c(
+    #    Path(__file__).parent / f"conker/asm/{asm_yaml_stuff[0]['address'][2:].upper()}.s", asm_yaml_stuff[0]["segment"]
+    # )
     update_yaml_to_c(yaml_file, asm_yaml_stuff[0])
+    # Build to make splat generate the C file from the updated YAML (really I only need "make extract")
+    subprocess.run("./build.sh", check=True)
     return
     pragmas = get_globalasmpragmas()
     pprint(pragmas)
