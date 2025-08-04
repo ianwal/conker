@@ -223,6 +223,19 @@ def decompile_fn(asm_path: Path):
         )
     cmd = ["python3", DECOMPILER, asm_path]
     out = subprocess.run(cmd, capture_output=True, check=True)
+    # TODO: Handle decompile failures. They can happen.
+    # Example:
+    #     Traceback (most recent call last):
+    #   File "/workspaces/conker/autodecomp.py", line 422, in <module>
+    #   File "/workspaces/conker/autodecomp.py", line 332, in main
+    #     raw_decompiled_fn = decompile_fn(pragma.asm_path)
+    #                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    #   File "/workspaces/conker/autodecomp.py", line 225, in decompile_fn
+    #     out = subprocess.run(cmd, capture_output=True, check=True)
+    #           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    #   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    #     raise CalledProcessError(retcode, process.args,
+    # subprocess.CalledProcessError: Command '['python3', PosixPath('/workspaces/conker/tools/mips_to_c/m2c.py'), PosixPath('/workspaces/conker/conker/asm/nonmatchings/game_50D80/func_1502460C.s')]' returned non-zero exit status 1.
     return out.stdout.decode()
 
 
@@ -290,26 +303,39 @@ def main():
         description="Autodecompiles MIPS code. Currently the goal is to get standalone free-functions working.",
         epilog="Text at the bottom of help",
     )
-    parser.add_argument("cfile", help="The C file to decompile.", type=Path)
-    # args = parser.parse_args()
-    # print(args)
+    parser.add_argument("cfile", help="The C file to decompile.", type=Path, nargs="?")
+    args = parser.parse_args()
+    print(args)
     # pragmas = get_globalasmpragmas(args.cfile)
 
     # Build to regenerate the ASM and clean everything.
     subprocess.run("./build.sh", check=True)
 
-    yaml_file = Path(__file__).parent / "conker/conker.us.yaml"
-    asm_yaml_stuff = find_asm_lines(yaml_file, "subsegments")
-    print(asm_yaml_stuff[0])
-    # convert_s_to_c(
-    #    Path(__file__).parent / f"conker/asm/{asm_yaml_stuff[0]['address'][2:].upper()}.s", asm_yaml_stuff[0]["segment"]
-    # )
-    update_yaml_to_c(yaml_file, asm_yaml_stuff[0])
-    # Build to make splat generate the C file from the updated YAML (really I only need "make extract")
-    subprocess.run("./build.sh", check=True)
-    return
-    pragmas = get_globalasmpragmas()
+    CREATE_C_FILE = True
+    if CREATE_C_FILE:
+        yaml_file = Path(__file__).parent / "conker/conker.us.yaml"
+        asm_yaml_stuff = find_asm_lines(yaml_file, "subsegments")
+        target_address = "0x50D80"
+        filtered_asm_yaml_stuff = list(filter(lambda x: x["address"].lower() == target_address.lower(), asm_yaml_stuff))
+        single_filtered_asm_yaml_stuff = filtered_asm_yaml_stuff[
+            0
+        ]  # TODO: I want to do this iteratively, but for now do one.
+        print(single_filtered_asm_yaml_stuff)
+        # convert_s_to_c(
+        #    Path(__file__).parent / f"conker/asm/{asm_yaml_stuff[0]['address'][2:].upper()}.s", asm_yaml_stuff[0]["segment"]
+        # )
+        update_yaml_to_c(yaml_file, single_filtered_asm_yaml_stuff)
+        # Build to make splat generate the C file from the updated YAML (really I only need "make extract")
+        subprocess.run("./build.sh", check=True)
+        c_file_name = f"{single_filtered_asm_yaml_stuff['segment']}_{single_filtered_asm_yaml_stuff['address'][2:].upper()}"  # TODO: Hardcoded stuff I think
+        c_file = Path(__file__).parent / "conker/src" / f"{c_file_name}.c"  # TODO: Hardcoded section I think
+    else:
+        c_file = args.cfile
+
+    assert c_file
+    pragmas = get_globalasmpragmas(c_file)
     pprint(pragmas)
+    return
     if not pragmas:
         print(f"No #pragma GLOBAL_ASM found in {args.cfile}.")
     for pragma in tqdm.tqdm(pragmas, desc="Auto-decomp", colour="#00ff00"):
@@ -334,11 +360,11 @@ def main():
         # TODO: Only generate context up to the line in the file. If stuff is declared in that file AFTER the newly decompiled function,
         #       we can't see it in this function, so we don't want it to show up in the context.
         ctx_variables = get_extern_variables_raw(generate_mips_context(pragma.c_file))
-        log.info((ctx_variables))
+        log.info(ctx_variables)
         pre_decomp_variables = get_extern_variables_raw(pragma.c_file)
-        log.info(len((pre_decomp_variables)))
+        log.info(len(pre_decomp_variables))
 
-        failed = False
+        success = True
         with tempfile.TemporaryDirectory() as d:
             file_backup = Path(d) / pragma.c_file.name
             shutil.copy2(pragma.c_file, file_backup)
@@ -362,13 +388,11 @@ def main():
                 for var in vars_to_remove:
                     replace_line(pragma.c_file, "// REMOVED", var["line"])
                 log.info(f"Replaced '{len(vars_to_remove)}' lines.")
-                # post_decomp_variables_names = set([var["name"] for var in post_decomp_variables])
-                # log.info(list(dict.fromkeys(post_decomp_variables_names.intersection(ctx_variable_names))))
 
                 # Try to build
                 subprocess.run("./build.sh", check=True)
             except Exception:
-                failed = True
+                success = False
                 # If anything bad happens, restore the file, then build.
                 log.error(f"Replacement failed. Restoring file from backup: {pragma.c_file}")
                 shutil.copy2(file_backup, pragma.c_file)
@@ -377,31 +401,24 @@ def main():
             shutil.copy2(file_backup, pragma.c_file)
             # Build to regenerate the ASM for the next try.
             subprocess.run("./build.sh", check=True)
-            if failed:
+
+            # Write the result to a JSON.
+            json_file = Path(__file__).parent / "success.json"
+            if success:
                 log.info(f"Auto-decomp succeeded for: {pragma}")
-                json_file = Path(__file__).parent / "success.json"
-                # Load existing data or create new list
-                asm_list: list[GlobalAsmPragma] = []
-                if json_file.exists():
-                    with open(json_file, "r") as f:
-                        data = json.load(f)
-                        asm_list: list[GlobalAsmPragma] = [GlobalAsmPragma.from_dict(entry) for entry in data]
-                asm_list.append(pragma)
-                with open(json_file, "w") as f:
-                    json.dump([entry.to_dict() for entry in asm_list], f, indent=2)
             else:
                 log.error(f"Auto-decomp failed for: {pragma}")
                 json_file = Path(__file__).parent / "fail.json"
-                # Load existing data or create new list
-                asm_list: list[GlobalAsmPragma] = []
-                if json_file.exists():
-                    with open(json_file, "r") as f:
-                        data = json.load(f)
-                        asm_list: list[GlobalAsmPragma] = [GlobalAsmPragma.from_dict(entry) for entry in data]
-                asm_list.append(pragma)
 
-                with open(json_file, "w") as f:
-                    json.dump([entry.to_dict() for entry in asm_list], f, indent=2)
+            asm_list: list[GlobalAsmPragma] = []
+            if json_file.exists():
+                with open(json_file, "r") as f:
+                    data = json.load(f)
+                    asm_list: list[GlobalAsmPragma] = [GlobalAsmPragma.from_dict(entry) for entry in data]
+            asm_list.append(pragma)
+
+            with open(json_file, "w") as f:
+                json.dump([entry.to_dict() for entry in asm_list], f, indent=2)
 
 
 if __name__ == "__main__":
