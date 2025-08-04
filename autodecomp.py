@@ -305,129 +305,133 @@ def main():
     )
     parser.add_argument("cfile", help="The C file to decompile.", type=Path, nargs="?")
     args = parser.parse_args()
-    print(args)
-    # pragmas = get_globalasmpragmas(args.cfile)
 
     # Build to regenerate the ASM and clean everything.
+    # If this fails, something is very wrong. This is a sanity check.
     subprocess.run("./build.sh", check=True)
 
-    CREATE_C_FILE = True
-    if CREATE_C_FILE:
-        yaml_file = Path(__file__).parent / "conker/conker.us.yaml"
-        asm_yaml_stuff = find_asm_lines(yaml_file, "subsegments")
-        target_address = "0x50D80"
-        filtered_asm_yaml_stuff = list(filter(lambda x: x["address"].lower() == target_address.lower(), asm_yaml_stuff))
-        single_filtered_asm_yaml_stuff = filtered_asm_yaml_stuff[
-            0
-        ]  # TODO: I want to do this iteratively, but for now do one.
-        print(single_filtered_asm_yaml_stuff)
-        # convert_s_to_c(
-        #    Path(__file__).parent / f"conker/asm/{asm_yaml_stuff[0]['address'][2:].upper()}.s", asm_yaml_stuff[0]["segment"]
-        # )
-        update_yaml_to_c(yaml_file, single_filtered_asm_yaml_stuff)
-        # Build to make splat generate the C file from the updated YAML (really I only need "make extract")
-        subprocess.run("./build.sh", check=True)
-        c_file_name = f"{single_filtered_asm_yaml_stuff['segment']}_{single_filtered_asm_yaml_stuff['address'][2:].upper()}"  # TODO: Hardcoded stuff I think
-        c_file = Path(__file__).parent / "conker/src" / f"{c_file_name}.c"  # TODO: Hardcoded section I think
-    else:
-        c_file = args.cfile
-
-    assert c_file
-    pragmas = get_globalasmpragmas(c_file)
-    pprint(pragmas)
-    if not pragmas:
-        print(f"No #pragma GLOBAL_ASM found in {args.cfile}.")
-    for pragma in tqdm.tqdm(pragmas, desc="Auto-decomp", colour="#00ff00"):
+    yaml_file = Path(__file__).parent / "conker/conker.us.yaml"
+    asm_yaml_stuff = find_asm_lines(yaml_file, "subsegments")
+    for single_filtered_asm_yaml_stuff in asm_yaml_stuff:
         try:
-            # Build to regenerate the ASM and clean everything.
             subprocess.run("./build.sh", check=True)
 
-            raw_decompiled_fn = decompile_fn(pragma.asm_path)
-            log.info(f"Raw decompiled fn:\n{raw_decompiled_fn}")
+            print(single_filtered_asm_yaml_stuff)
+            # convert_s_to_c(
+            #    Path(__file__).parent / f"conker/asm/{asm_yaml_stuff[0]['address'][2:].upper()}.s", asm_yaml_stuff[0]["segment"]
+            # )
+            update_yaml_to_c(yaml_file, single_filtered_asm_yaml_stuff)
+            # Build to make splat generate the C file from the updated YAML (really I only need "make extract")
+            subprocess.run("./build.sh", check=True)
+            c_file_name = f"{single_filtered_asm_yaml_stuff['segment']}_{single_filtered_asm_yaml_stuff['address'][2:].upper()}"  # TODO: Hardcoded stuff I think
+            c_file = Path(__file__).parent / "conker/src" / f"{c_file_name}.c"  # TODO: Hardcoded section I think
 
-            # Do processing to make a best attempt to make the decompiled code compilable.
-
-            # Replace any unknown variables with s32.
-            decompiled_fn = raw_decompiled_fn.replace("?", "s32")
-            log.info(f"Cleaned up decompiled fn:\n{decompiled_fn}")
-
-            # Remove any duplicate or conflicting extern's from known include files.
-            # This avoids "previously declared variable" compiler errors.
-            # lll = get_declared_variables()
-            # log.info(get_extern_variables_raw(pragma.c_file))
-
-            log.info("Generating MIPS context")
-            # TODO: Only generate context up to the line in the file. If stuff is declared in that file AFTER the newly decompiled function,
-            #       we can't see it in this function, so we don't want it to show up in the context.
-            ctx_variables = get_extern_variables_raw(generate_mips_context(pragma.c_file))
-            log.info(ctx_variables)
-            pre_decomp_variables = get_extern_variables_raw(pragma.c_file)
-            log.info(len(pre_decomp_variables))
-
-            success = True
-            with tempfile.TemporaryDirectory() as d:
-                file_backup = Path(d) / pragma.c_file.name
-                shutil.copy2(pragma.c_file, file_backup)
+            assert c_file
+            pragmas = get_globalasmpragmas(c_file)
+            pprint(pragmas)
+            if not pragmas:
+                print(f"No #pragma GLOBAL_ASM found in {c_file}.")
+            for pragma in tqdm.tqdm(pragmas, desc="Auto-decomp", colour="#00ff00"):
                 try:
-                    # Replace the pragma in the file
-                    replace_pragma_with_c(pragma.c_file, pragma, CCode(decompiled_fn.split("\n")))
-                    post_decomp_variables = get_extern_variables_raw(pragma.c_file)
-                    log.info(len((post_decomp_variables)))
-                    # for each variable, if the variable was there before WITH THE SAME TYPE, ignore it.
-                    # if it has a different type, then find it and remove it.
-                    vars_to_remove = []
-                    pre_decomp_variable_names = tuple([var["name"] for var in pre_decomp_variables])
-                    ctx_variable_names = tuple(var["name"] for var in ctx_variables)
-                    for post_decomp_var in post_decomp_variables:
-                        if post_decomp_var["name"] not in pre_decomp_variable_names and post_decomp_var["name"] not in [
-                            ctx_variable_names
-                        ]:
-                            vars_to_remove.append(post_decomp_var)
-                    # log.info(f"Vars to remove: {vars_to_remove}")
-                    log.info(len(vars_to_remove))
-                    for var in vars_to_remove:
-                        replace_line(pragma.c_file, "// REMOVED", var["line"])
-                    log.info(f"Replaced '{len(vars_to_remove)}' lines.")
-
-                    # Try to build
+                    # Build to regenerate the ASM and clean everything.
                     subprocess.run("./build.sh", check=True)
-                except Exception:
-                    success = False
-                    # If anything bad happens, restore the file, then build.
-                    log.error(f"Replacement failed. Restoring file from backup: {pragma.c_file}")
-                    shutil.copy2(file_backup, pragma.c_file)
-                    # Build to regenerate the ASM for the next try.
-                    subprocess.run("./build.sh", check=True)
-                shutil.copy2(file_backup, pragma.c_file)
-                # Build to regenerate the ASM for the next try.
-                subprocess.run("./build.sh", check=True)
 
-                # Write the result to a JSON.
-                json_file = Path(__file__).parent / "success.json"
-                if success:
-                    log.info(f"Auto-decomp succeeded for: {pragma}")
-                else:
-                    log.error(f"Auto-decomp failed for: {pragma}")
-                    json_file = Path(__file__).parent / "fail.json"
+                    raw_decompiled_fn = decompile_fn(pragma.asm_path)
+                    log.info(f"Raw decompiled fn:\n{raw_decompiled_fn}")
 
-                asm_list: list[GlobalAsmPragma] = []
-                if json_file.exists():
-                    with open(json_file, "r") as f:
-                        data = json.load(f)
-                        asm_list: list[GlobalAsmPragma] = [GlobalAsmPragma.from_dict(entry) for entry in data]
-                asm_list.append(pragma)
+                    # Do processing to make a best attempt to make the decompiled code compilable.
 
-                with open(json_file, "w") as f:
-                    json.dump([entry.to_dict() for entry in asm_list], f, indent=2)
+                    # Replace any unknown variables with s32.
+                    decompiled_fn = raw_decompiled_fn.replace("?", "s32")
+                    log.info(f"Cleaned up decompiled fn:\n{decompiled_fn}")
+
+                    # Remove any duplicate or conflicting extern's from known include files.
+                    # This avoids "previously declared variable" compiler errors.
+                    # lll = get_declared_variables()
+                    # log.info(get_extern_variables_raw(pragma.c_file))
+
+                    log.info("Generating MIPS context")
+                    # TODO: Only generate context up to the line in the file. If stuff is declared in that file AFTER the newly decompiled function,
+                    #       we can't see it in this function, so we don't want it to show up in the context.
+                    ctx_variables = get_extern_variables_raw(generate_mips_context(pragma.c_file))
+                    log.info(ctx_variables)
+                    pre_decomp_variables = get_extern_variables_raw(pragma.c_file)
+                    log.info(len(pre_decomp_variables))
+
+                    success = True
+                    with tempfile.TemporaryDirectory() as d:
+                        file_backup = Path(d) / pragma.c_file.name
+                        shutil.copy2(pragma.c_file, file_backup)
+                        try:
+                            # Replace the pragma in the file
+                            replace_pragma_with_c(pragma.c_file, pragma, CCode(decompiled_fn.split("\n")))
+                            post_decomp_variables = get_extern_variables_raw(pragma.c_file)
+                            log.info(len((post_decomp_variables)))
+                            # for each variable, if the variable was there before WITH THE SAME TYPE, ignore it.
+                            # if it has a different type, then find it and remove it.
+                            vars_to_remove = []
+                            pre_decomp_variable_names = tuple([var["name"] for var in pre_decomp_variables])
+                            ctx_variable_names = tuple(var["name"] for var in ctx_variables)
+                            for post_decomp_var in post_decomp_variables:
+                                if post_decomp_var["name"] not in pre_decomp_variable_names and post_decomp_var[
+                                    "name"
+                                ] not in [ctx_variable_names]:
+                                    vars_to_remove.append(post_decomp_var)
+                            # log.info(f"Vars to remove: {vars_to_remove}")
+                            log.info(len(vars_to_remove))
+                            for var in vars_to_remove:
+                                replace_line(pragma.c_file, "// REMOVED", var["line"])
+                            log.info(f"Replaced '{len(vars_to_remove)}' lines.")
+
+                            # Try to build
+                            subprocess.run("./build.sh", check=True)
+                        except Exception:
+                            success = False
+                            # If anything bad happens, restore the file, then build.
+                            log.error(f"Replacement failed. Restoring file from backup: {pragma.c_file}")
+                            shutil.copy2(file_backup, pragma.c_file)
+                            # Build to regenerate the ASM for the next try.
+                            subprocess.run("./build.sh", check=True)
+                        shutil.copy2(file_backup, pragma.c_file)
+                        # Build to regenerate the ASM for the next try.
+                        subprocess.run("./build.sh", check=True)
+
+                        # Write the result to a JSON.
+                        json_file = Path(__file__).parent / "success.json"
+                        if success:
+                            log.info(f"Auto-decomp succeeded for: {pragma}")
+                        else:
+                            log.error(f"Auto-decomp failed for: {pragma}")
+                            json_file = Path(__file__).parent / "fail.json"
+
+                        asm_list: list[GlobalAsmPragma] = []
+                        if json_file.exists():
+                            with open(json_file, "r") as f:
+                                data = json.load(f)
+                                asm_list: list[GlobalAsmPragma] = [GlobalAsmPragma.from_dict(entry) for entry in data]
+                        asm_list.append(pragma)
+
+                        with open(json_file, "w") as f:
+                            json.dump([entry.to_dict() for entry in asm_list], f, indent=2)
+                except Exception as exc:
+                    log.error(f"pragma unexpected failure: {pragma}")
+
+            # Discard changes to tracked files in conker/ (recursive)
+            # We mainly want to discard the changes to the yaml.
+            subprocess.run(["git", "checkout", "--", f"{Path(__file__).parent / 'conker'}"])
+
+            # Remove untracked and gitignored files and directories in conker/ (recursive)
+            subprocess.run(["git", "clean", "-fdx", "--", f"{Path(__file__).parent / 'conker'}"])
+
         except Exception as exc:
-            log.error(f"pragma unexpected failure: {pragma}")
+            log.error(f"complete failure for yaml file: {single_filtered_asm_yaml_stuff}.\nException: {exc}")
 
-    # Discard changes to tracked files in conker/ (recursive)
-    # We mainly want to discard the changes to the yaml.
-    subprocess.run(["git", "checkout", "--", f"{Path(__file__).parent / 'conker'}"])
+        # Discard changes to tracked files in conker/ (recursive)
+        # We mainly want to discard the changes to the yaml.
+        subprocess.run(["git", "checkout", "--", f"{Path(__file__).parent / 'conker'}"])
 
-    # Remove untracked and gitignored files and directories in conker/ (recursive)
-    subprocess.run(["git", "clean", "-fdx", "--", f"{Path(__file__).parent / 'conker'}"])
+        # Remove untracked and gitignored files and directories in conker/ (recursive)
+        subprocess.run(["git", "clean", "-fdx", "--", f"{Path(__file__).parent / 'conker'}"])
 
 if __name__ == "__main__":
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG)
