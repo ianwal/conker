@@ -128,7 +128,7 @@ segments:
       - [0x22DC0, asm, libultra/os/interrupt]
       - [0x22E00, asm, libultra/os/stopthread]
       - [0x22EC0, c, libultra/libc/string]
-      - [0x22F60, asm, libultra/libc/lldiv]
+      - [0x22F60, c, libultra/libc/lldiv]
       - [0x23060, c, libultra/libc/ldiv]
       - [0x230F0, asm, libultra/libc/xlitob]
       - [0x23390, c,   libultra/io/ai]
