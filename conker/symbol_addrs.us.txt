@@ -245,6 +245,8 @@ __osPackRamReadData2            = 0x151F22C4;
 __osContRamWrite2               = 0x151F2430;
 __osPackRamWriteData2           = 0x151F2660;
 
+osRomBase                       = 0x80000308;
+
 __osPfsPifRam                   = 0x800429D0; 
 __osMaxControllers              = 0x80042A51;
 __osContInitialized             = 0x8002BE10;

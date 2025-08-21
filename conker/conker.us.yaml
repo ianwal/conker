@@ -176,7 +176,7 @@ segments:
       - [0x25FD0, c, libultra/io/crc]
       - [0x26150, c, libultra/os/destroythread]
       - [0x26250, c, libultra/io/viblack]
-      - [0x262C0, asm, libultra/io/pigetstat]
+      - [0x262C0, c, libultra/io/pigetstat]
       - [0x262D0, asm, libultra/os/unmaptlb]
       - [0x26310, asm, libultra/os/maptlb]
       - [0x263D0, c,   libultra/io/aisetfreq] # -O1
@@ -184,7 +184,7 @@ segments:
       - [0x26540, asm, libultra/gu/sinf]
       - [0x26700, asm, libultra/io/sprawread]
       - [0x26750, asm, libultra/io/sprawwrite]
-      - [0x267A0, asm, libultra/io/pirawread]
+      - [0x267A0, c, libultra/io/pirawread]
       - [0x26800, c, libultra/libc/ll]
       - [0x26AC0, asm, libultra/os/sethwinterrupt]
       - [0x26B10, asm, libultra/io/leointerrupt]
