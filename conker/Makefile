@@ -192,6 +192,7 @@ $(BUILD_DIR)/$(SRC_DIR)/libultra/io/pirawread.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/spgetstat.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/viblack.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/vigetcurrcontext.c.o: OPT_FLAGS := -O1
+$(BUILD_DIR)/$(SRC_DIR)/libultra/io/viswapbuf.c.o: OPT_FLAGS := -O1
 
 $(BUILD_DIR)/$(SRC_DIR)/libultra/os/%.c.o: OPT_FLAGS = -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/os/createthread.c.o: OPT_FLAGS := -O2 -g3
