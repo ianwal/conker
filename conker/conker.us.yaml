@@ -191,7 +191,7 @@ segments:
       - [0x273D0, asm, libultra/os/probetlb]
       - [0x27490, asm, libultra/os/setcompare]
       - [0x274A0, asm, libultra/os/jammesg]
-      - [0x275F0, asm, libultra/io/pigetcmdq]
+      - [0x275F0, c, libultra/io/pigetcmdq]
       - [0x27620, asm, libultra/io/spgetstat]
       - [0x27630, asm, libultra/io/si]
       - [0x27660, asm, libultra/io/pfsinit]
