@@ -248,8 +248,10 @@ __osPackRamWriteData2           = 0x151F2660;
 
 osRomBase                       = 0x80000308;
 
+__osEventStateTab               = 0x80042910;
 __osPfsPifRam                   = 0x800429D0; 
 __osMaxControllers              = 0x80042A51;
+__osTimerList                   = 0x8002BD70;
 __osContInitialized             = 0x8002BE10;
 __osContPifRam                  = 0x80042A10;
 __osEepromTimerQ                = 0x80042A78;
