@@ -185,7 +185,7 @@ segments:
       - [0x26700, asm, libultra/io/sprawread]
       - [0x26750, asm, libultra/io/sprawwrite]
       - [0x267A0, asm, libultra/io/pirawread]
-      - [0x26800, asm, libultra/libc/__ull_rshift]
+      - [0x26800, c, libultra/libc/ll]
       - [0x26AC0, asm, libultra/os/sethwinterrupt]
       - [0x26B10, asm, libultra/io/leointerrupt]
       - [0x273D0, asm, libultra/os/probetlb]
