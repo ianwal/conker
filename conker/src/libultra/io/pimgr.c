@@ -1,9 +1,16 @@
-// #include <os_internal.h>
-// #include "piint.h"
-//
+#include <os_internal.h>
+#include "piint.h"
+#include "macros.h"
+#include "rdb.h"
+#include "ultraerror.h"
+
+// Matching, but needs .bss and .data migrated.
+// https://decomp.me/scratch/7YZx9
+#pragma GLOBAL_ASM("asm/nonmatchings/libultra/io/pimgr/osCreatePiManager.s")
+
 // s32 osPiRawStartDma(s32 direction, u32 devAddr, void *dramAddr, u32 size);
 // s32 osEPiRawStartDma(OSPiHandle *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size);
-//
+// 
 // OSDevMgr __osPiDevMgr = {0};
 // OSPiHandle *__osPiTable = NULL;
 // OSPiHandle *__osCurrentHandle[2] = {&CartRomHandle, &LeoDiskHandle};
@@ -55,5 +62,3 @@
 // 		}
 // 	}
 // }
-
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/io/pimgr/osCreatePiManager.s")
