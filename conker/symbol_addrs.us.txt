@@ -109,8 +109,8 @@ __osPiRelAccess                 = 0x10023764;
 osCreateMesgQueue               = 0x10023790;
 osSetEventMesg                  = 0x100237C0;
 osGetThreadPri                  = 0x10023830;
-osPiRawStartDma                 = 0x10023850;
-osEPiRawStartDma                = 0x10023930;
+__osPiRawStartDma               = 0x10023850;
+__osEPiRawStartDma              = 0x10023930;
 osWritebackDCache               = 0x10023D20;
 __osTimerServicesInit           = 0x10023EB0;
 __osTimerInterrupt              = 0x10023F3C;
@@ -296,3 +296,5 @@ D_80091A30 = 0x80091A30; // type:label
 D_80091AB8 = 0x80091AB8; // type:label
 func_16000B14 = 0x16000B14; // type:func
 D_1600487C = 0x1600487C; // type:label
+
+piEventBuf = 0x80036B58;

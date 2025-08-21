@@ -156,7 +156,7 @@ extern OSThread *D_80035910;
 
 extern s32 D_800364C4;
 extern OSMesgQueue D_80036B40;
-extern OSMesg      D_80036B58;
+extern OSMesg  piEventBuf[1];
 extern struct00 *D_80036B60;
 extern s32  D_80036B70;
 extern s32  D_80036B78;
