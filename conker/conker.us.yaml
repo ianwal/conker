@@ -175,7 +175,7 @@ segments:
       - [0x25C20, asm, libultra/io/contramread]
       - [0x25FD0, c, libultra/io/crc]
       - [0x26150, c, libultra/os/destroythread]
-      - [0x26250, asm, libultra/io/viblack]
+      - [0x26250, c, libultra/io/viblack]
       - [0x262C0, asm, libultra/io/pigetstat]
       - [0x262D0, asm, libultra/os/unmaptlb]
       - [0x26310, asm, libultra/os/maptlb]
