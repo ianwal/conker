@@ -267,6 +267,7 @@ gMessageQueue0    = 0x800388C8;
 gMessages         = 0x800388F8;
 gMessage0         = 0x80038400;
 __osPiTable       = 0x8002AB6C;
+__osHwIntTable    = 0x8002AC70;
 __OSGlobalIntMask = 0x8002BD1C;
 __osThreadTail    = 0x8002BDF0;
 __osRunQueue      = 0x8002BDF8;
