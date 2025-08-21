@@ -2,8 +2,9 @@
 #include "functions.h"
 #include "variables.h"
 #include "R4300.h"
+#include "macros.h"
 
-OSPiHandle LeoDiskHandle; // ALIGNED(0x8);
+OSPiHandle LeoDiskHandle ALIGNED(0x8);
 OSPiHandle *__osDiskHandle;
 
 OSPiHandle *osLeoDiskInit(void) {
