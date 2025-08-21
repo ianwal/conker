@@ -246,12 +246,16 @@ __osContPifRam                  = 0x80042A10;
 __osEepromTimerQ                = 0x80042A78;
 __osContLastCmd                 = 0x80042A50;
 
+tmp_task          = 0x80036B60;
 gMessageQueue     = 0x80038908;
 gMessageQueue0    = 0x800388C8;
 gMessages         = 0x800388F8;
 gMessage0         = 0x80038400;
+__osThreadTail    = 0x8002BDF0;
+__osRunQueue      = 0x8002BDF8;
 __osActiveQueue   = 0x8002BDFC;
 __osRunningThread = 0x8002BE00;
+__osFaultedThread = 0x8002BE04;
 n_alGlobals       = 0x8002BA40;
 n_syn             = 0x8002BA44;
 osViClock         = 0x8002BDE8;

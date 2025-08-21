@@ -1,6 +1,27 @@
 #include <ultra64.h>
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/io/sptask/_VirtualToPhysicalTask.s")
+#define _osVirtualToPhysical(ptr)              \
+    if (ptr != NULL) {                         \
+        ptr = (void*)osVirtualToPhysical(ptr); \
+    } (void)0
+
+// TODO: tmp_task should be static but that needs bss fixed.
+extern OSTask tmp_task;
+
+static OSTask* _VirtualToPhysicalTask(OSTask* intp) {
+    OSTask* tp;
+    tp = &tmp_task;
+    bcopy(intp, tp, sizeof(OSTask));
+
+    _osVirtualToPhysical(tp->t.ucode);
+    _osVirtualToPhysical(tp->t.ucode_data);
+    _osVirtualToPhysical(tp->t.dram_stack);
+    _osVirtualToPhysical(tp->t.output_buff);
+    _osVirtualToPhysical(tp->t.output_buff_size);
+    _osVirtualToPhysical(tp->t.data_ptr);
+    _osVirtualToPhysical(tp->t.yield_data_ptr);
+    return tp;
+}
 
 void osSpTaskLoad(OSTask *intp)
 {

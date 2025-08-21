@@ -1,5 +1,7 @@
 #include <rcp.h>
-#include "../os/osint.h"
+#include "osint.h"
+
+extern s32 osViClock;
 
 s32 osAiSetFrequency(u32 frequency)
 {
