@@ -173,7 +173,7 @@ segments:
       - [0x257C0, asm, libultra/io/sirawdma]
       - [0x25870, asm, libultra/io/contramwrite]
       - [0x25C20, asm, libultra/io/contramread]
-      - [0x25FD0, asm, libultra/io/crc]
+      - [0x25FD0, c, libultra/io/crc]
       - [0x26150, c, libultra/os/destroythread]
       - [0x26250, asm, libultra/io/viblack]
       - [0x262C0, asm, libultra/io/pigetstat]
