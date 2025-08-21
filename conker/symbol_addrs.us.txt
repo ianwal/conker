@@ -11,6 +11,7 @@ osMotorStop                     = 0x10005570;
 osMotorStart                    = 0x100056A0;
 _MakeMotorData                  = 0x100057E0;
 osMotorInit                     = 0x10005948;
+__osDispatchThread              = 0x10007A38;
 __osCleanupThread               = 0x10007BF8;
 osMapTLBRdb                     = 0x10008120;
 alHeapInit                      = 0x10012820;
