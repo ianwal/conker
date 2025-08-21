@@ -172,7 +172,7 @@ $(BUILD_DIR)/$(SRC_DIR)/init_214F0.c.o: OPT_FLAGS := -g
 $(BUILD_DIR)/$(SRC_DIR)/init_22040.c.o: OPT_FLAGS := -g
 $(BUILD_DIR)/$(SRC_DIR)/init_22460.c.o: OPT_FLAGS := -g
 
-# $(BUILD_DIR)/$(SRC_DIR)/libultra/libc/%.c.o: OPT_FLAGS := -O3
+$(BUILD_DIR)/$(SRC_DIR)/libultra/libc/%.c.o: OPT_FLAGS := -O3
 
 # TODO: This should be -O3, but strchr doesn't match for some reason and asm-processor doesn't work with -O3.
 $(BUILD_DIR)/$(SRC_DIR)/libultra/libc/string.c.o: OPT_FLAGS := -O2
