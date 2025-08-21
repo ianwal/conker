@@ -187,6 +187,7 @@ $(BUILD_DIR)/$(SRC_DIR)/libultra/io/aisetfreq.c.o: OPT_FLAGS := -O1
 # $(BUILD_DIR)/$(SRC_DIR)/libultra/io/contramwrite.c.o: OPT_FLAGS := -O1 # TODO
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/crc.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/leodiskinit.c.o: OPT_FLAGS := -O1
+$(BUILD_DIR)/$(SRC_DIR)/libultra/io/pfschecker.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/pidma.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/pigetcmdq.c.o: OPT_FLAGS := -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/io/pigetstat.c.o: OPT_FLAGS := -O1

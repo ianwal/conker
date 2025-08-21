@@ -209,13 +209,13 @@ s32 __osCheckPackId(OSPfs *pfs, __OSPackId *temp);
 s32 __osGetId(OSPfs *pfs);
 s32 __osCheckId(OSPfs *pfs);
 s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-#if BUILD_VERSION >= VERSION_J
+#if 0 // BUILD_VERSION >= VERSION_J
 s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
 #else
 s32 __osPfsSelectBank(OSPfs *pfs);
 #endif
 s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank, int *decleared, int *last_page);
-#if BUILD_VERSION >= VERSION_J
+#if 0 // BUILD_VERSION >= VERSION_J
 s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u8 bank, __OSInodeUnit *last_page);
 #else
 s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank, __OSInodeUnit *last_page, int flag);
