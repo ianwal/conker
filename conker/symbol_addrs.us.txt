@@ -251,12 +251,15 @@ __osContInitialized             = 0x8002BE10;
 __osContPifRam                  = 0x80042A10;
 __osEepromTimerQ                = 0x80042A78;
 __osContLastCmd                 = 0x80042A50;
+LeoDiskHandle                   = 0x80043AC0;
+__osDiskHandle                  = 0x80043B34;
 
 tmp_task          = 0x80036B60;
 gMessageQueue     = 0x80038908;
 gMessageQueue0    = 0x800388C8;
 gMessages         = 0x800388F8;
 gMessage0         = 0x80038400;
+__osPiTable       = 0x8002AB6C;
 __OSGlobalIntMask = 0x8002BD1C;
 __osThreadTail    = 0x8002BDF0;
 __osRunQueue      = 0x8002BDF8;

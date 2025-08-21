@@ -195,7 +195,7 @@ segments:
       - [0x27620, c, libultra/io/spgetstat]
       - [0x27630, asm, libultra/io/si]
       - [0x27660, c, libultra/io/pfsinit]
-      - [0x27820, asm, libultra/io/leodiskinit]
+      - [0x27820, c, libultra/io/leodiskinit]
       - [0x27910, asm, libultra/io/contpfs]
       - [0x28670, asm, libultra/io/pfschecker]
 
