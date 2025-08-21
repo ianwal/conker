@@ -210,6 +210,7 @@ guRotateF                       = 0x15048190;
 guRotate                        = 0x15048310;
 tanf                            = 0x1504A5E0;
 guMtxF2L                        = 0x150A7790;
+// osPiReadIo                      = 0x151EF040;
 guNormalize                     = 0x151EFFF0;
 osPfsIsPlug2                    = 0x151F1D10;
 __osPfsRequestData2             = 0x151F1EB0;
@@ -278,6 +279,7 @@ __osPiDevMgr      = 0x8002AB50;
 
 piEventQueue      = 0x80036B40;
 __osPiAccessQueueEnabled = 0x8002BD60;
+piAccessBuf       = 0x800428F0;
 __osPiAccessQueue = 0x800428F8;
 
 D_8008857C = 0x8008857C; // type:label

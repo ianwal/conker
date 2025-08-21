@@ -135,7 +135,7 @@ segments:
       - [0x233C0, asm, libultra/os/virtualtophysical]
       - [0x23440, asm, libultra/os/recvmesg]
       - [0x23580, asm, libultra/os/sendmesg]
-      - [0x236D0, asm, libultra/os/piacs]
+      - [0x236D0, c, libultra/os/piacs]
       - [0x23790, c, libultra/os/createmesgqueue]
       - [0x237C0, asm, libultra/os/seteventmesg]
       - [0x23830, c,   libultra/os/getthreadpri]
