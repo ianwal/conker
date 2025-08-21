@@ -149,7 +149,7 @@ segments:
       - [0x23E80, asm, libultra/io/sp]
       - [0x23EB0, asm, libultra/os/timerintr]
       - [0x242B0, asm, libultra/io/vi]
-      - [0x24400, asm, libultra/io/pigettype]
+      - [0x24400, c, libultra/io/vigetcurrcontext]
       - [0x24410, c, libultra/io/viswapcontext]
       - [0x24770, asm, libultra/os/getcount]
       - [0x24780, asm, libultra/os/thread]

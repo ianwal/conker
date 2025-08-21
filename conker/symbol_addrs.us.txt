@@ -119,6 +119,7 @@ __osSpDeviceBusy                = 0x10023e80;
 __osSetTimerIntr                = 0x100240B4;
 __osInsertTimer                 = 0x10024128;
 __osViInit                      = 0x100242b0;
+__osViGetCurrentContext         = 0x10024400;
 __osViSwapContext               = 0x10024410;
 osGetCount                      = 0x10024770;
 __osDequeueThread               = 0x10024780;
@@ -259,6 +260,8 @@ __osRunningThread = 0x8002BE00;
 __osFaultedThread = 0x8002BE04;
 n_alGlobals       = 0x8002BA40;
 n_syn             = 0x8002BA44;
+__osViCurr        = 0x8002BDE0;
+__osViNext        = 0x8002BDE4;
 osViClock         = 0x8002BDE8;
 hdwrBugFlag       = 0x8002AB40;
 
