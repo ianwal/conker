@@ -223,6 +223,8 @@ $(BUILD_DIR)/$(SRC_DIR)/libultra/os/%.c.o: OPT_FLAGS = -O1
 $(BUILD_DIR)/$(SRC_DIR)/libultra/os/createthread.c.o: OPT_FLAGS := -O2 -g3
 $(BUILD_DIR)/$(SRC_DIR)/libultra/os/viswapcontext.c.o: OPT_FLAGS := -O1
 
+$(BUILD_DIR)/$(SRC_DIR)/libultra/gu/sinf.c.o: OPT_FLAGS := -O3
+
 $(BUILD_DIR)/$(SRC_DIR)/init_3920.c.o: OPT_FLAGS := -O2
 
 # $(BUILD_DIR)/$(SRC_DIR)/init_B1B0.o: OPT_FLAGS := -O2

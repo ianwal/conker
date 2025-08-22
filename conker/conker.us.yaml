@@ -181,7 +181,7 @@ segments:
       - [0x26310, hasm, libultra/os/maptlb]
       - [0x263D0, c,   libultra/io/aisetfreq] # -O1
       - [0x26530, hasm, libultra/gu/sqrtf]
-      - [0x26540, asm, libultra/gu/sinf]
+      - [0x26540, c, libultra/gu/sinf]
       - [0x26700, c, libultra/io/sirawread]
       - [0x26750, c, libultra/io/sirawwrite]
       - [0x267A0, c, libultra/io/pirawread]
@@ -227,6 +227,7 @@ segments:
       - [0x2C820, rodata]
       - [0x2C830, rodata]
       - [0x2C850, rodata]
+      - [0x2C8D0, .rodata, libultra/gu/sinf]
       - [0x2C920, rodata]
       - [0x2C960, rodata]
       # TODO: could .bss be from 0x8002D4B0 to 0x80082B20 (0x55670 big) i.e. to start of game_data ?
