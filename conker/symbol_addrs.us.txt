@@ -255,6 +255,7 @@ __osPfsPifRam                   = 0x800429D0;
 __osMaxControllers              = 0x80042A51;
 siAccessBuf                     = 0x80042AA0;
 __osSiAccessQueue               = 0x80042AA8;
+// __osBaseTimer                   = 0x80042990;
 __osTimerList                   = 0x8002BD70;
 __osContInitialized             = 0x8002BE10;
 __osSiAccessQueueEnabled        = 0x8002BE20;
