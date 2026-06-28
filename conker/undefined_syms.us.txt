@@ -54,3 +54,41 @@ D_8002C520 = 0x8002C520;
 D_80095A30 = 0x80095A30;
 
 D_80041EA0 = 0x80041EA0;
+
+__osEnqueueAndYield = 0x100078B4;
+__osEnqueueThread   = 0x100079D8;
+__osPopThread       = 0x10007A24;
+__osDispatchThread  = 0x10007A38;
+__osViCurr          = 0x8002BDE0;
+__osViNext          = 0x8002BDE4;
+__osPiDevMgr        = 0x8002AB50;
+__osHwIntTable      = 0x8002AC70;
+osRomBase           = 0x80000308;
+osRomType           = 0x8002BDE0;
+__OSGlobalIntMask   = 0x8002BD1C;
+__libm_qnan_f       = 0x8002C920;
+/* bss symbols in asm that are inside the bss gap-filler sub segments added for the piacs/timerintr/siacs .bss placement. splat no longer emits them so they need to be here */
+__osContPifRam      = 0x80042A10;
+__osContLastCmd     = 0x80042A50;
+__osMaxControllers  = 0x80042A51;
+__osEepromTimerQ    = 0x80042A78;
+D_800429D0          = 0x800429D0;
+D_80042A0C          = 0x80042A0C;
+D_80042A4C          = 0x80042A4C;
+D_80042A90          = 0x80042A90;
+/* auto-pinned, bss symbols suppressed by the bss filler sub segments */
+D_8003C8E0          = 0x8003C8E0;
+D_8003E384          = 0x8003E384;
+D_800418B0          = 0x800418B0;
+D_800419A0          = 0x800419A0;
+D_80041E58          = 0x80041E58;
+D_80041F00          = 0x80041F00;
+D_80041F04          = 0x80041F04;
+D_80041F08          = 0x80041F08;
+D_80041F0C          = 0x80041F0C;
+D_80041FD8          = 0x80041FD8;
+D_80041FDC          = 0x80041FDC;
+D_800427B0          = 0x800427B0;
+D_80042850          = 0x80042850;
+D_800428C1          = 0x800428C1;
+D_800428C2          = 0x800428C2;

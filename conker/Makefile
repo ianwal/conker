@@ -64,10 +64,18 @@ TARGET = $(BUILD_DIR)/$(BASENAME).$(VERSION)
 
 LD_SCRIPT = $(BASENAME).ld
 
+ULTRALIB_DIR     := ../lib/ultralib
+ULTRALIB_VERSION := I
+ULTRALIB_TARGET  := libultra_rom
+LIBULTRA_FULL    := $(BUILD_DIR)/$(ULTRALIB_TARGET).full.a
+LIBULTRA_ARCHIVE := $(BUILD_DIR)/$(ULTRALIB_TARGET).a
+LIBULTRA_MEMBERS := $(shell sed -nE 's/^[[:space:]]*- \[.*lib, $(ULTRALIB_TARGET), ([A-Za-z0-9_]+),.*/\1/p' $(BASENAME).$(VERSION).yaml | sort -u)
+
 # Build tools
 CC     := ../ido/ido5.3_recomp/cc
 
 CROSS   = mips-linux-gnu-
+AR      = $(CROSS)ar
 AS      = $(CROSS)as
 CPP     = cpp
 LD      = $(CROSS)ld
@@ -238,10 +246,24 @@ $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT)
 	$(call print2,Preprocessing linker script:,$<,$@)
 	@$(CPP) -P -DBUILD_DIR=$(BUILD_DIR) -o $@ $<
 
+$(LIBULTRA_FULL):
+	$(call print1,Building libultra:,$(ULTRALIB_TARGET) 2.0$(ULTRALIB_VERSION))
+	$(MAKE) -C $(ULTRALIB_DIR) VERSION=$(ULTRALIB_VERSION) TARGET=$(ULTRALIB_TARGET) COMPARE=0 MODERN_LD=1 setup
+	$(MAKE) -C $(ULTRALIB_DIR) VERSION=$(ULTRALIB_VERSION) TARGET=$(ULTRALIB_TARGET) COMPARE=0 MODERN_LD=1
+	$(CP) $(ULTRALIB_DIR)/build/$(ULTRALIB_VERSION)/$(ULTRALIB_TARGET)/$(ULTRALIB_TARGET).a $@
+
+$(LIBULTRA_ARCHIVE): $(LIBULTRA_FULL) $(BASENAME).$(VERSION).yaml
+	$(call print1,Reducing libultra archive:,$@)
+	$(RM) -f $@
+	$(RM) -rf $(BUILD_DIR)/.libultra_members
+	$(MKDIR) -p $(BUILD_DIR)/.libultra_members
+	cd $(BUILD_DIR)/.libultra_members && $(AR) x ../../$(LIBULTRA_FULL) $(addsuffix .o,$(LIBULTRA_MEMBERS))
+	$(AR) rcs $@ $(addprefix $(BUILD_DIR)/.libultra_members/,$(addsuffix .o,$(LIBULTRA_MEMBERS)))
+
 # .o -> .elf
-$(TARGET).elf: $(O_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(GLOBAL_ASM_O_FILES)
+$(TARGET).elf: $(O_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(GLOBAL_ASM_O_FILES) $(LIBULTRA_ARCHIVE)
 	$(call print1,Linking elf:,$@)
-	$(LD) $(LDFLAGS) -o $@
+	$(LD) $(LDFLAGS) --whole-archive $(LIBULTRA_ARCHIVE) --no-whole-archive -o $@
 
 ifndef PERMUTER
 # .c -> .o with asm processor

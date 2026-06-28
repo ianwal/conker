@@ -10,3 +10,6 @@
 [submodule "tools/mips_to_c"]
 	path = tools/mips_to_c
 	url = https://github.com/matt-kempster/mips_to_c.git
+[submodule "lib/ultralib"]
+	path = lib/ultralib
+	url = https://github.com/decompals/ultralib.git
